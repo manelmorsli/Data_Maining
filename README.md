@@ -11,8 +11,8 @@ Ce projet couvre deux algorithmes de clustering fondamentaux, implémentés sur 
 
 | Algorithme | Dataset | Approche |
 |---|---|---|
-| **K-Means** | Kaggle Interests Group (6 340 utilisateurs, 217 intérêts) | Custom from scratch + scikit-learn |
-| **Clustering Hiérarchique** | COVID-19 Europe ECDC (28 729 entrées, 30 pays) | Agglomératif Ward (Bottom-Up) + Divisif (Top-Down) |
+| **K-Means** | `aligned_data.csv` — Intérêts utilisateurs (6 340 × 217) | Custom from scratch + scikit-learn |
+| **Clustering Hiérarchique** | `data-Clustering-Hiérarchique.csv` — COVID-19 Europe (28 729 × 11, 30 pays) | Agglomératif Ward (Bottom-Up) + Divisif (Top-Down) |
 
 Un rapport HTML interactif (`rapport.html`) documente l'ensemble du projet : panorama de **toutes** les stratégies de clustering connues, code annoté, résultats visualisés, conseils pratiques et métriques d'évaluation.
 
@@ -86,9 +86,9 @@ pip install pandas numpy scikit-learn scipy matplotlib seaborn jupyter
 jupyter notebook
 ```
 
-> **Note :** Le dataset `kaggle_Interests_group.csv` n'est pas inclus (licence Kaggle).
-> Téléchargez-le sur Kaggle et placez-le dans le même dossier que `tpKMeans.ipynb`.
-> Le dataset COVID-19 (`data-Clustering-Hiérarchique.csv`) est dans le dossier source.
+> Les deux datasets sont inclus dans le dépôt :
+> - `aligned_data.csv` → utilisé par `tpKMeans.ipynb`
+> - `data-Clustering-Hiérarchique.csv` → utilisé par `Clustering_hierarchique.ipynb`
 
 ---
 

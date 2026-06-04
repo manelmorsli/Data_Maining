@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -639,9 +639,9 @@ pre .var { color: #f78c6c; }
   <div class="fig-cap">Fig. 3 &#8212; Aper&#231;u des premi&#232;res lignes du dataset : matrice binaire indiquant la pr&#233;sence (1.0) ou l&#8217;absence (NaN&#8594;0) de chaque int&#233;r&#234;t pour chaque utilisateur</div>
 </div>
 
-<div class="callout info">
-  <div class="callout-title">Remarque sur le dataset</div>
-  Le fichier <code>kaggle_Interests_group.csv</code> n&#8217;est pas inclus dans ce d&#233;p&#244;t pour des raisons de licence Kaggle. T&#233;l&#233;chargez-le depuis la plateforme Kaggle et placez-le dans le dossier du notebook avant ex&#233;cution.
+<div class="callout def">
+  <div class="callout-title">Dataset disponible dans le d&#233;p&#244;t</div>
+  Le fichier <code>aligned_data.csv</code> est inclus dans ce d&#233;p&#244;t &#8212; aucun t&#233;l&#233;chargement externe n&#233;cessaire. Note : les deux projets utilisent des datasets diff&#233;rents : <code>aligned_data.csv</code> pour K-Means, <code>data-Clustering-Hi&#233;rarchique.csv</code> pour le clustering hi&#233;rarchique.
 </div>
 
 
@@ -659,7 +659,7 @@ pre .var { color: #f78c6c; }
 <span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
 <span class="kw">import</span> seaborn <span class="kw">as</span> sns
 
-data = pd.<span class="fn">read_csv</span>(<span class="str">"kaggle_Interests_group.csv"</span>)
+data = pd.<span class="fn">read_csv</span>(<span class="str">"aligned_data.csv"</span>)
 data = data.<span class="fn">fillna</span>(<span class="num">0</span>)   <span class="cmt"># NaN &#8594; 0 : int&#233;r&#234;t absent</span>
 
 somme_interets = data.<span class="fn">iloc</span>[:, <span class="num">2</span>:].<span class="fn">sum</span>()
@@ -831,6 +831,9 @@ plt.<span class="fn">show</span>()</pre>
 
 <pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
 <span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> MinMaxScaler
+
+<span class="cmt"># Chargement du dataset COVID-19</span>
+data = pd.<span class="fn">read_csv</span>(<span class="str">"data-Clustering-Hi&#233;rarchique.csv"</span>)
 
 <span class="cmt"># Alignement sur la plage temporelle commune &#224; tous les pays</span>
 data[<span class="str">'dateRep'</span>] = pd.<span class="fn">to_datetime</span>(data[<span class="str">'dateRep'</span>], format=<span class="str">'%d/%m/%Y'</span>)
