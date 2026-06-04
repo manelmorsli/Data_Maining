@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stratégies de Clustering · Data Mining</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1F535;</text></svg>">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink:    #1a1a2e;
+  --muted:  #5a5a7a;
+  --line:   #d8d8e8;
+  --accent: #2563eb;
+  --gold:   #b8860b;
+  --bg:     #fafaf8;
+  --card:   #f4f4f0;
+  --red:    #c0392b;
+  --green:  #166534;
+  --teal:   #0f766e;
+  --purple: #7c3aed;
+}
+
+html { font-size: 15px; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Crimson Pro', Georgia, serif;
+  line-height: 1.75;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 3rem 2.5rem;
+}
+
+@media print {
+  body { padding: 0; max-width: none; }
+  .no-print { display: none; }
+  .page-break { break-before: page; }
+  a { color: inherit; text-decoration: none; }
+}
+
+/* ── COVER ── */
+.cover {
+  text-align: center;
+  padding: 4rem 2rem 5rem;
+  border-bottom: 3px solid var(--ink);
+  margin-bottom: 3rem;
+}
+.cover .univ {
+  font-family: 'Inter', sans-serif;
+  font-size: .82rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--muted);
+  margin-bottom: .5rem;
+}
+.cover .module {
+  font-family: 'Inter', sans-serif;
+  font-size: .88rem;
+  color: var(--muted);
+  margin-bottom: 2.5rem;
+}
+.cover .title {
+  font-size: 2.8rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: .6rem;
+}
+.cover .subtitle {
+  font-size: 1.4rem;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--muted);
+  margin-bottom: 2.5rem;
+}
+.cover .meta {
+  font-family: 'Inter', sans-serif;
+  font-size: .85rem;
+  color: var(--muted);
+}
+.cover .meta span { font-weight: 600; color: var(--ink); }
+.cover-rule { width: 60px; height: 3px; background: var(--gold); margin: 1.5rem auto; }
+
+/* ── TOC ── */
+.toc { margin-bottom: 3rem; }
+.toc h2 { font-family: 'Inter', sans-serif; font-size: 1rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 1rem; }
+.toc ol { list-style: none; padding: 0; }
+.toc li { display: flex; justify-content: space-between; padding: .35rem 0; border-bottom: 1px dotted var(--line); font-size: .95rem; }
+.toc li .num { color: var(--muted); min-width: 2rem; }
+.toc li .page { color: var(--muted); font-family: 'Inter', sans-serif; font-size: .82rem; }
+.toc-part { font-weight: 700; margin-top: .6rem; }
+.toc-sub { padding-left: 1.5rem; font-style: italic; }
+
+/* ── HEADINGS ── */
+h1.part-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -.3px;
+  border-top: 3px solid var(--ink);
+  border-bottom: 1px solid var(--line);
+  padding: .7rem 0;
+  margin: 2.5rem 0 1.5rem;
+}
+h2.section {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 2rem 0 .8rem;
+  color: var(--ink);
+}
+h2.section::before {
+  content: attr(data-n) '. ';
+  color: var(--muted);
+}
+h3.subsection {
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 1.5rem 0 .6rem;
+  color: var(--ink);
+}
+
+/* ── BODY TEXT ── */
+p { margin-bottom: 1rem; font-size: 1rem; text-align: justify; }
+p + p { text-indent: 1.5em; }
+strong { font-weight: 700; }
+em { font-style: italic; }
+
+/* ── TABLES ── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.2rem 0;
+  font-family: 'Inter', sans-serif;
+  font-size: .82rem;
+}
+th {
+  background: var(--ink);
+  color: #fff;
+  text-align: left;
+  padding: .55rem .8rem;
+  font-weight: 600;
+  font-size: .78rem;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+td { padding: .5rem .8rem; border-bottom: 1px solid var(--line); }
+tr:nth-child(even) td { background: var(--card); }
+caption {
+  font-family: 'Inter', sans-serif;
+  font-size: .8rem;
+  color: var(--muted);
+  text-align: left;
+  padding: .3rem 0;
+  caption-side: bottom;
+}
+
+/* ── CODE ── */
+code {
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: .88em;
+  background: #ededf7;
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--purple);
+}
+pre {
+  background: #13131f;
+  color: #ccd6f6;
+  border-radius: 6px;
+  padding: 1.2rem;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: .82rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  margin: 1rem 0 1.5rem;
+  white-space: pre-wrap;
+}
+pre .kw  { color: #c792ea; }
+pre .cls { color: #82aaff; }
+pre .str { color: #c3e88d; }
+pre .cmt { color: #546e7a; font-style: italic; }
+pre .fn  { color: #82aaff; }
+pre .num { color: #f78c6c; }
+pre .var { color: #f78c6c; }
+
+/* ── CALLOUTS ── */
+.callout {
+  border-left: 4px solid var(--gold);
+  background: #fefce8;
+  padding: .9rem 1.2rem;
+  border-radius: 0 6px 6px 0;
+  margin: 1.2rem 0;
+  font-size: .92rem;
+}
+.callout.info  { border-color: var(--accent); background: #eff6ff; }
+.callout.def   { border-color: var(--green);  background: #f0fdf4; }
+.callout.tip   { border-color: var(--teal);   background: #f0fdfa; }
+.callout.warn  { border-color: var(--red);    background: #fff5f5; }
+.callout .callout-title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: .78rem;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  margin-bottom: .4rem;
+  color: var(--muted);
+}
+
+/* ── FIGURES ── */
+.fig {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1.5rem 0;
+  text-align: center;
+}
+.fig img {
+  max-width: 100%;
+  border-radius: 4px;
+  display: block;
+  margin: 0 auto;
+}
+.fig-cap {
+  font-family: 'Inter', sans-serif;
+  font-size: .78rem;
+  color: var(--muted);
+  margin-top: .7rem;
+  font-style: italic;
+}
+
+/* ── ALGORITHM CARD ── */
+.algo-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  background: #fff;
+}
+.algo-card .algo-name {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: .95rem;
+  color: var(--ink);
+  margin-bottom: .4rem;
+}
+.algo-card .algo-tag {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-size: .68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  padding: 2px 7px;
+  border-radius: 3px;
+  margin-right: 4px;
+  margin-bottom: 4px;
+}
+.algo-card .algo-tag.green  { background: var(--green); }
+.algo-card .algo-tag.teal   { background: var(--teal); }
+.algo-card .algo-tag.purple { background: var(--purple); }
+.algo-card .algo-tag.red    { background: var(--red); }
+.algo-card .algo-tag.gold   { background: var(--gold); }
+
+/* ── STEP LIST ── */
+.steps { counter-reset: step; padding: 0; margin: 1rem 0; }
+.steps li {
+  counter-increment: step;
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+  margin-bottom: .8rem;
+  font-size: .97rem;
+  align-items: flex-start;
+}
+.steps li::before {
+  content: counter(step);
+  flex-shrink: 0;
+  width: 1.6rem;
+  height: 1.6rem;
+  background: var(--ink);
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-size: .75rem;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: .1rem;
+}
+
+/* ── BIBLIO ── */
+.biblio { padding-left: 1.5rem; }
+.biblio li { margin-bottom: .6rem; font-size: .92rem; }
+
+/* ── GRID ── */
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+@media (max-width: 600px) { .grid2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════
+     COVER
+════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="univ">Universit&#233; &middot; D&#233;partement Informatique</div>
+  <div class="module">Module : Data Mining &middot; 2024&#8211;2025</div>
+  <div class="cover-rule"></div>
+  <div class="title">Strat&#233;gies de Clustering</div>
+  <div class="subtitle">
+    K-Means &amp; Clustering Hi&#233;rarchique<br>
+    Application sur donn&#233;es r&#233;elles &#8212; Int&#233;r&#234;ts utilisateurs &amp; COVID-19
+  </div>
+  <div class="cover-rule"></div>
+  <div class="meta">
+    R&#233;alis&#233; par : <span>Manel Morsli</span><br>
+    Ann&#233;e universitaire : <span>2024 &#8211; 2025</span><br>
+    Technologies : <span>Python 3 &middot; pandas &middot; scikit-learn &middot; SciPy &middot; matplotlib &middot; seaborn</span><br>
+    Notebooks : <span>Clustering_hierarchique.ipynb &middot; tpKMeans.ipynb</span>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════
+     TABLE OF CONTENTS
+════════════════════════════════════════════ -->
+<div class="toc">
+  <h2>Table des mati&#232;res</h2>
+  <ol>
+    <li class="toc-part"><span class="num"></span><span>Partie I &#8212; Panorama des strat&#233;gies de clustering</span><span class="page">3</span></li>
+    <li class="toc-sub"><span class="num">1.</span><span>Introduction et d&#233;finition du clustering</span><span class="page">3</span></li>
+    <li class="toc-sub"><span class="num">2.</span><span>Clustering par partitionnement</span><span class="page">4</span></li>
+    <li class="toc-sub"><span class="num">3.</span><span>Clustering hi&#233;rarchique</span><span class="page">5</span></li>
+    <li class="toc-sub"><span class="num">4.</span><span>Clustering bas&#233; sur la densit&#233;</span><span class="page">6</span></li>
+    <li class="toc-sub"><span class="num">5.</span><span>Clustering bas&#233; sur les mod&#232;les</span><span class="page">7</span></li>
+    <li class="toc-sub"><span class="num">6.</span><span>Clustering spectral</span><span class="page">7</span></li>
+    <li class="toc-sub"><span class="num">7.</span><span>Tableau comparatif et guide de s&#233;lection</span><span class="page">8</span></li>
+    <li class="toc-part" style="margin-top:.8rem"><span class="num"></span><span>Partie II &#8212; K-Means Clustering</span><span class="page">9</span></li>
+    <li class="toc-sub"><span class="num">8.</span><span>Pr&#233;sentation du dataset Kaggle Interests</span><span class="page">9</span></li>
+    <li class="toc-sub"><span class="num">9.</span><span>Exploration et visualisation des donn&#233;es</span><span class="page">10</span></li>
+    <li class="toc-sub"><span class="num">10.</span><span>Impl&#233;mentation personnalis&#233;e (algorithme TD)</span><span class="page">11</span></li>
+    <li class="toc-sub"><span class="num">11.</span><span>Impl&#233;mentation avec Scikit-learn</span><span class="page">13</span></li>
+    <li class="toc-sub"><span class="num">12.</span><span>R&#233;sultats et analyse</span><span class="page">14</span></li>
+    <li class="toc-part" style="margin-top:.8rem"><span class="num"></span><span>Partie III &#8212; Clustering Hi&#233;rarchique</span><span class="page">15</span></li>
+    <li class="toc-sub"><span class="num">13.</span><span>Pr&#233;sentation du dataset COVID-19 Europe</span><span class="page">15</span></li>
+    <li class="toc-sub"><span class="num">14.</span><span>Pr&#233;traitement et alignement temporel</span><span class="page">16</span></li>
+    <li class="toc-sub"><span class="num">15.</span><span>Approche agglom&#233;rative Bottom-Up (Ward)</span><span class="page">17</span></li>
+    <li class="toc-sub"><span class="num">16.</span><span>Approche divisive Top-Down</span><span class="page">19</span></li>
+    <li class="toc-sub"><span class="num">17.</span><span>Analyse des r&#233;sultats</span><span class="page">20</span></li>
+    <li class="toc-part" style="margin-top:.8rem"><span class="num"></span><span>Partie IV &#8212; Conseils pratiques &amp; Approfondissements</span><span class="page">21</span></li>
+    <li class="toc-sub"><span class="num">18.</span><span>Choisir le bon algorithme</span><span class="page">21</span></li>
+    <li class="toc-sub"><span class="num">19.</span><span>D&#233;terminer K optimal &#8212; Elbow &amp; Silhouette</span><span class="page">22</span></li>
+    <li class="toc-sub"><span class="num">20.</span><span>Pi&#232;ges courants et bonnes pratiques</span><span class="page">23</span></li>
+    <li class="toc-sub"><span class="num">21.</span><span>Extensions et perspectives</span><span class="page">24</span></li>
+    <li class="toc-sub"><span class="num"></span><span>R&#233;f&#233;rences</span><span class="page">25</span></li>
+  </ol>
+</div>
+
+
+<!-- ════════════════════════════════════════════
+     PARTIE I
+════════════════════════════════════════════ -->
+<h1 class="part-title page-break">Partie I &#8212; Panorama des strat&#233;gies de clustering</h1>
+
+<h2 class="section" data-n="1">Introduction et d&#233;finition du clustering</h2>
+
+<p>
+  Le <strong>clustering</strong> (ou regroupement non supervis&#233;) est une technique fondamentale du Data Mining qui consiste &#224; partitionner un ensemble de donn&#233;es en groupes homog&#232;nes appel&#233;s <em>clusters</em>, de sorte que les objets &#224; l&#8217;int&#233;rieur d&#8217;un m&#234;me cluster soient <strong>similaires</strong> entre eux et <strong>dissemblables</strong> des objets des autres clusters. Contrairement &#224; la classification supervis&#233;e, le clustering n&#8217;utilise pas d&#8217;&#233;tiquettes pr&#233;alablement connues : il d&#233;couvre la structure latente des donn&#233;es.
+</p>
+
+<div class="callout def">
+  <div class="callout-title">D&#233;finition formelle</div>
+  &#201;tant donn&#233; un ensemble de points <em>X = {x&#8321;, x&#8322;, &#8230;, x&#8345;}</em> dans un espace m&#233;trique muni d&#8217;une mesure de distance <em>d(&#183;,&#183;)</em>, le clustering vise &#224; trouver une partition <em>C = {C&#8321;, C&#8322;, &#8230;, C&#8336;}</em> telle que la <strong>coh&#233;sion intra-cluster soit maximis&#233;e</strong> et la <strong>s&#233;paration inter-cluster soit maximis&#233;e</strong>.
+</div>
+
+<p>
+  Le clustering trouve des applications dans de tr&#232;s nombreux domaines : segmentation client en marketing, d&#233;tection d&#8217;anomalies en cybers&#233;curit&#233;, groupement de documents en TAL, analyse de g&#232;nes en bioinformatique, compression d&#8217;images, et bien s&#251;r l&#8217;analyse &#233;pid&#233;miologique illustr&#233;e dans ce projet.
+</p>
+
+<h3 class="subsection">Mesures de distance</h3>
+
+<table>
+  <thead><tr><th>Mesure</th><th>Formule</th><th>Cas d&#8217;usage</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Euclidienne</strong></td><td>&#8730;&#8721;(x&#7522; &#8722; y&#7522;)&#178;</td><td>Donn&#233;es continues, clusters sph&#233;riques</td></tr>
+    <tr><td><strong>Manhattan</strong></td><td>&#8721;|x&#7522; &#8722; y&#7522;|</td><td>Donn&#233;es avec outliers, grilles</td></tr>
+    <tr><td><strong>Cosinus</strong></td><td>1 &#8722; (x&#183;y)/(&#8214;x&#8214;&#8214;y&#8214;)</td><td>Texte, donn&#233;es de haute dimension</td></tr>
+    <tr><td><strong>Hamming</strong></td><td>nb. de positions diff&#233;rentes</td><td>Donn&#233;es binaires, cha&#238;nes</td></tr>
+    <tr><td><strong>Minkowski</strong></td><td>(&#8721;|x&#7522; &#8722; y&#7522;|&#7510;)^(1/p)</td><td>G&#233;n&#233;ralisation (p=1&#8594;Manhattan, p=2&#8594;Euclidienne)</td></tr>
+    <tr><td><strong>Mahalanobis</strong></td><td>&#8730;((x&#8722;&#956;)&#7488;&#931;&#8315;&#185;(x&#8722;&#956;))</td><td>Donn&#233;es corr&#233;l&#233;es, ellipso&#239;des</td></tr>
+  </tbody>
+  <caption>Table 1 &#8212; Mesures de distance courantes en clustering</caption>
+</table>
+
+
+<h2 class="section" data-n="2">Clustering par partitionnement</h2>
+
+<p>
+  Les m&#233;thodes de <strong>partitionnement</strong> divisent les donn&#233;es en <em>k</em> groupes non-hi&#233;rarchiques, o&#249; <em>k</em> est un param&#232;tre fix&#233; &#224; l&#8217;avance. Ces m&#233;thodes sont g&#233;n&#233;ralement it&#233;ratives et optimisent une fonction objectif (souvent la somme des distances internes aux clusters).
+</p>
+
+<div class="algo-card">
+  <div class="algo-name">K-Means <span class="algo-tag">Impl&#233;ment&#233;</span></div>
+  <p style="font-size:.9rem;margin-bottom:.5rem">Algorithme it&#233;ratif qui assigne chaque point au centro&#239;de le plus proche, puis met &#224; jour les centro&#239;des comme la moyenne des points assign&#233;s.</p>
+  <strong style="font-size:.85rem">Complexit&#233; :</strong> <code>O(n&#183;k&#183;t&#183;d)</code> &#8212; n points, k clusters, t it&#233;rations, d dimensions<br>
+  <strong style="font-size:.85rem">Avantages :</strong> rapide, simple, scalable<br>
+  <strong style="font-size:.85rem">Limites :</strong> k fix&#233;, sensible aux outliers, clusters sph&#233;riques uniquement, minimum local
+</div>
+
+<div class="algo-card">
+  <div class="algo-name">K-Medoids (PAM) <span class="algo-tag green">Robuste</span></div>
+  <p style="font-size:.9rem;margin-bottom:.5rem">Variante de K-Means o&#249; le repr&#233;sentant de chaque cluster est un <em>point r&#233;el</em> des donn&#233;es (medo&#239;de) plut&#244;t qu&#8217;une moyenne. Beaucoup plus robuste aux outliers.</p>
+  <strong style="font-size:.85rem">Complexit&#233; :</strong> <code>O(k(n&#8722;k)&#178;)</code> &#8212; plus lent que K-Means<br>
+  <strong style="font-size:.85rem">Utilisation :</strong> donn&#233;es avec outliers, ou quand la moyenne n&#8217;a pas de sens (donn&#233;es cat&#233;gorielles)
+</div>
+
+<div class="algo-card">
+  <div class="algo-name">CLARANS <span class="algo-tag teal">Grandes donn&#233;es</span></div>
+  <p style="font-size:.9rem;margin-bottom:.5rem">Clustering Large Applications based on RANdomized Search. Version am&#233;lior&#233;e de PAM utilisant un &#233;chantillonnage al&#233;atoire pour acc&#233;l&#233;rer la recherche sur les grands jeux de donn&#233;es.</p>
+  <strong style="font-size:.85rem">Complexit&#233; :</strong> <code>O(n&#178;)</code><br>
+  <strong style="font-size:.85rem">Avantage :</strong> meilleure scalabilit&#233; que PAM pour grands datasets
+</div>
+
+<h3 class="subsection">Algorithme K-Means &#8212; Pseudo-code</h3>
+<ol class="steps">
+  <li>Choisir <em>k</em> centro&#239;des initiaux al&#233;atoirement parmi les donn&#233;es</li>
+  <li>Assigner chaque point au centro&#239;de le plus proche (distance euclidienne)</li>
+  <li>Recalculer chaque centro&#239;de comme la moyenne de tous les points qui lui ont &#233;t&#233; assign&#233;s</li>
+  <li>R&#233;p&#233;ter les &#233;tapes 2&#8211;3 jusqu&#8217;&#224; convergence (centro&#239;des stables ou max_iters atteint)</li>
+</ol>
+
+<div class="callout warn">
+  <div class="callout-title">Point de vigilance &#8212; Initialisation</div>
+  K-Means est sensible &#224; l&#8217;initialisation des centro&#239;des. Une mauvaise initialisation peut conduire &#224; un <strong>minimum local</strong>. La m&#233;thode <strong>K-Means++</strong> (scikit-learn par d&#233;faut) am&#233;liore l&#8217;initialisation en choisissant les centro&#239;des de fa&#231;on &#224; les &#233;carter au maximum, r&#233;duisant consid&#233;rablement la probabilit&#233; de converger vers un mauvais minimum.
+</div>
+
+
+<h2 class="section" data-n="3">Clustering hi&#233;rarchique</h2>
+
+<p>
+  Les m&#233;thodes <strong>hi&#233;rarchiques</strong> construisent une structure arborescente (dendrogramme) repr&#233;sentant les relations d&#8217;embo&#238;tement entre clusters. Elles ne n&#233;cessitent pas de sp&#233;cifier <em>k</em> &#224; l&#8217;avance : l&#8217;utilisateur d&#233;coupe le dendrogramme au niveau souhait&#233; apr&#232;s coup.
+</p>
+
+<div class="fig">
+  <img src="screenshots/1_ICdqpcL62G1q_kIlVszrrg.png" alt="Dendrogramme agglom&#233;ratif vs divisif">
+  <div class="fig-cap">Fig. 1 &#8212; Les deux directions d&#8217;un clustering hi&#233;rarchique : agglom&#233;ratif (Bottom-Up) et divisif (Top-Down)</div>
+</div>
+
+<div class="fig">
+  <img src="screenshots/Screenshot 2025-01-24 161739.png" alt="Taxonomie des m&#233;thodes de clustering">
+  <div class="fig-cap">Fig. 2 &#8212; Taxonomie compl&#232;te des m&#233;thodes de clustering : Partitionnement, Hi&#233;rarchiques (Agglom&#233;ratif/Divisif) et Densit&#233;</div>
+</div>
+
+<div class="algo-card">
+  <div class="algo-name">AGNES &#8212; Agglomerative Nesting <span class="algo-tag">Impl&#233;ment&#233; (Ward)</span></div>
+  <p style="font-size:.9rem;margin-bottom:.5rem">Approche <strong>Bottom-Up</strong> : d&#233;marre avec chaque point comme son propre cluster, puis fusionne it&#233;rativement les deux clusters les plus proches. La <strong>m&#233;thode de liaison Ward</strong> minimise l&#8217;accroissement de la variance interne lors de chaque fusion.</p>
+  <strong style="font-size:.85rem">Liaisons :</strong> Ward &middot; Complete &middot; Average &middot; Single &middot; Centroid<br>
+  <strong style="font-size:.85rem">Complexit&#233; :</strong> <code>O(n&#178; log n)</code><br>
+  <strong style="font-size:.85rem">Avantages :</strong> pas de k requis, dendrogramme interpr&#233;table, robuste
+</div>
+
+<div class="algo-card">
+  <div class="algo-name">DIANA &#8212; DIvisive ANAlysis <span class="algo-tag">Impl&#233;ment&#233; (Top-Down)</span></div>
+  <p style="font-size:.9rem;margin-bottom:.5rem">Approche <strong>Top-Down</strong> : d&#233;marre avec tous les points dans un seul cluster global, puis divise r&#233;cursivement les clusters les moins coh&#233;sifs. Utilis&#233; dans ce projet via <code>cut_tree</code>.</p>
+  <strong style="font-size:.85rem">Complexit&#233; :</strong> <code>O(n&#178;)</code><br>
+  <strong style="font-size:.85rem">Avantage :</strong> meilleur pour les grandes divisions au sommet de la hi&#233;rarchie
+</div>
+
+<div class="algo-card">
+  <div class="algo-name">BIRCH <span class="algo-tag teal">Grandes donn&#233;es</span></div>
+  <p style="font-size:.9rem;margin-bottom:.5rem">Balanced Iterative Reducing and Clustering using Hierarchies. Construit un arbre CF (Clustering Feature) compact, puis applique un clustering sur ses feuilles. Con&#231;u pour tr&#232;s grands datasets en m&#233;moire limit&#233;e.</p>
+  <strong style="font-size:.85rem">Complexit&#233; :</strong> <code>O(n)</code> &#8212; lin&#233;aire !
+</div>
+
+<div class="algo-card">
+  <div class="algo-name">CURE <span class="algo-tag purple">Non-sph&#233;rique</span></div>
+  <p style="font-size:.9rem;margin-bottom:.5rem">Clustering Using REpresentatives. Repr&#233;sente chaque cluster par plusieurs points (pas juste un centro&#239;de), permettant de d&#233;tecter des <strong>clusters de formes arbitraires</strong> et de g&#233;rer les outliers.</p>
+</div>
+
+<h3 class="subsection">M&#233;thodes de liaison (linkage)</h3>
+<table>
+  <thead><tr><th>M&#233;thode</th><th>Distance entre clusters</th><th>Forme des clusters</th><th>Sensibilit&#233; aux outliers</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Single (min)</strong></td><td>Plus courte distance entre tout point de A et tout point de B</td><td>Allong&#233;e, cha&#238;nes</td><td>Tr&#232;s &#233;lev&#233;e</td></tr>
+    <tr><td><strong>Complete (max)</strong></td><td>Plus longue distance entre tout point de A et tout point de B</td><td>Compacte, sph&#233;rique</td><td>Mod&#233;r&#233;e</td></tr>
+    <tr><td><strong>Average</strong></td><td>Moyenne de toutes les paires de distances</td><td>Interm&#233;diaire</td><td>Faible</td></tr>
+    <tr><td><strong>Ward</strong></td><td>Accroissement de la variance interne</td><td>Sph&#233;rique, compacte</td><td>Faible</td></tr>
+    <tr><td><strong>Centroid</strong></td><td>Distance entre centro&#239;des des clusters</td><td>Interm&#233;diaire</td><td>Mod&#233;r&#233;e</td></tr>
+  </tbody>
+  <caption>Table 2 &#8212; M&#233;thodes de liaison pour le clustering hi&#233;rarchique agglom&#233;ratif</caption>
+</table>
+
+
+<h2 class="section" data-n="4">Clustering bas&#233; sur la densit&#233;</h2>
+
+<p>
+  Les m&#233;thodes <strong>bas&#233;es sur la densit&#233;</strong> d&#233;finissent les clusters comme des r&#233;gions de haute densit&#233; de points, s&#233;par&#233;es par des r&#233;gions de faible densit&#233;. Leur atout majeur est de d&#233;tecter des <strong>clusters de formes arbitraires</strong> et d&#8217;identifier automatiquement les <strong>outliers</strong>.
+</p>
+
+<div class="algo-card">
+  <div class="algo-name">DBSCAN <span class="algo-tag green">Non-param&#233;trique</span></div>
+  <p style="font-size:.9rem;margin-bottom:.5rem">D&#233;finit deux param&#232;tres : <code>&#949;</code> (rayon de voisinage) et <code>MinPts</code> (nombre minimum de voisins). Un point est <em>core</em> s&#8217;il a &#8805; MinPts voisins dans son &#949;-voisinage. Les clusters sont les composantes connexes de core points.</p>
+  <strong style="font-size:.85rem">Complexit&#233; :</strong> <code>O(n log n)</code> avec index spatial<br>
+  <strong style="font-size:.85rem">Avantages :</strong> pas de k requis, d&#233;tecte les outliers (label &#8722;1), formes arbitraires<br>
+  <strong style="font-size:.85rem">Limite :</strong> difficile avec densit&#233;s variables
+</div>
+
+<div class="algo-card">
+  <div class="algo-name">OPTICS <span class="algo-tag teal">Densit&#233; variable</span></div>
+  <p style="font-size:.9rem;margin-bottom:.5rem">Extension de DBSCAN qui g&#232;re les clusters de <strong>densit&#233;s variables</strong>. Produit un graphe de r&#233;achtabilit&#233; permettant d&#8217;extraire des clusters &#224; diff&#233;rents niveaux de densit&#233;.</p>
+</div>
+
+<div class="algo-card">
+  <div class="algo-name">DENCLUE <span class="algo-tag purple">Estimateur de densit&#233;</span></div>
+  <p style="font-size:.9rem;margin-bottom:.5rem">DENsity-based CLUstEring. Bas&#233; sur l&#8217;estimation par noyaux (kernel density estimation). D&#233;finit les clusters comme des r&#233;gions autour des maxima locaux de la fonction de densit&#233; estim&#233;e.</p>
+</div>
+
+<div class="callout tip">
+  <div class="callout-title">Quand utiliser DBSCAN ?</div>
+  DBSCAN est id&#233;al quand vous ne connaissez pas le nombre de clusters, que vos donn&#233;es ont des <strong>formes non sph&#233;riques</strong> (demi-lunes, anneaux, spirales), ou quand vous voulez d&#233;tecter des <strong>anomalies</strong> (les points &#233;tiquet&#233;s &#8722;1 sont des outliers). En revanche, il ne fonctionne pas bien si les clusters ont des densit&#233;s tr&#232;s diff&#233;rentes ou en haute dimension (mal&#233;diction de la dimensionnalit&#233;).
+</div>
+
+
+<h2 class="section" data-n="5">Clustering bas&#233; sur les mod&#232;les</h2>
+
+<p>
+  Ces m&#233;thodes supposent que les donn&#233;es ont &#233;t&#233; g&#233;n&#233;r&#233;es par un <strong>m&#233;lange de distributions probabilistes</strong>. Chaque cluster correspond &#224; une composante du m&#233;lange. L&#8217;algorithme EM (Expectation-Maximization) est utilis&#233; pour estimer les param&#232;tres.
+</p>
+
+<div class="algo-card">
+  <div class="algo-name">GMM &#8212; Gaussian Mixture Models <span class="algo-tag purple">Probabiliste</span></div>
+  <p style="font-size:.9rem;margin-bottom:.5rem">Mod&#233;lise les donn&#233;es comme un m&#233;lange de <em>k</em> gaussiennes. Chaque point a une <strong>probabilit&#233; d&#8217;appartenance</strong> &#224; chaque cluster (soft assignment). Les param&#232;tres (&#956;, &#931;, &#960;) sont estim&#233;s par EM.</p>
+  <strong style="font-size:.85rem">Avantages :</strong> clusters ellipso&#239;daux, assignation douce, g&#233;n&#233;ralise K-Means<br>
+  <strong style="font-size:.85rem">Limite :</strong> suppose la normalit&#233;, plus co&#251;teux que K-Means<br>
+  <strong style="font-size:.85rem">Python :</strong> <code>sklearn.mixture.GaussianMixture</code>
+</div>
+
+<h3 class="subsection">Lien entre K-Means et GMM</h3>
+<p>
+  K-Means est un cas particulier de GMM o&#249; toutes les gaussiennes ont la m&#234;me covariance isotropique (sph&#233;rique) et l&#8217;assignation est dure (0 ou 1). En ce sens, GMM est une <strong>g&#233;n&#233;ralisation probabiliste de K-Means</strong>, permettant des clusters ellipso&#239;daux et des fronti&#232;res souples.
+</p>
+
+
+<h2 class="section" data-n="6">Clustering spectral</h2>
+
+<p>
+  Le <strong>clustering spectral</strong> s&#8217;appuie sur les vecteurs propres (<em>spectres</em>) du <em>Laplacien</em> du graphe de similarit&#233; des donn&#233;es. Il est particuli&#232;rement efficace pour des structures de donn&#233;es complexes que les m&#233;thodes traditionnelles ne peuvent pas capturer.
+</p>
+
+<div class="algo-card">
+  <div class="algo-name">Spectral Clustering <span class="algo-tag gold">Graphes</span></div>
+  <ol class="steps" style="margin-top:.5rem">
+    <li>Construire un graphe de similarit&#233; (ex. k-NN ou noyau gaussien)</li>
+    <li>Calculer le Laplacien normalis&#233; <code>L = D&#8315;&#189;(D&#8722;W)D&#8315;&#189;</code></li>
+    <li>Extraire les <em>k</em> vecteurs propres associ&#233;s aux plus petites valeurs propres</li>
+    <li>Appliquer K-Means dans l&#8217;espace des vecteurs propres</li>
+  </ol>
+  <br>
+  <strong style="font-size:.85rem">Avantage :</strong> d&#233;tecte des clusters non convexes, efficace pour les graphes<br>
+  <strong style="font-size:.85rem">Limite :</strong> <code>O(n&#179;)</code> &#8212; ne scale pas aux tr&#232;s grands datasets<br>
+  <strong style="font-size:.85rem">Python :</strong> <code>sklearn.cluster.SpectralClustering</code>
+</div>
+
+
+<h2 class="section" data-n="7">Tableau comparatif et guide de s&#233;lection</h2>
+
+<table>
+  <thead>
+    <tr><th>Algorithme</th><th>k requis ?</th><th>Forme clusters</th><th>Outliers</th><th>Scalabilit&#233;</th><th>Complexit&#233;</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>K-Means</strong></td><td>Oui</td><td>Sph&#233;rique</td><td>Sensible</td><td>Tr&#232;s bonne</td><td>O(nkt)</td></tr>
+    <tr><td><strong>K-Medoids</strong></td><td>Oui</td><td>Sph&#233;rique</td><td>Robuste</td><td>Moyenne</td><td>O(k(n&#8722;k)&#178;)</td></tr>
+    <tr><td><strong>AGNES/Ward</strong></td><td>Non</td><td>Sph&#233;rique</td><td>Mod&#233;r&#233;</td><td>Moyenne</td><td>O(n&#178; log n)</td></tr>
+    <tr><td><strong>DIANA</strong></td><td>Non</td><td>Arbitraire</td><td>Mod&#233;r&#233;</td><td>Moyenne</td><td>O(n&#178;)</td></tr>
+    <tr><td><strong>BIRCH</strong></td><td>Non</td><td>Sph&#233;rique</td><td>Bon</td><td>Tr&#232;s bonne</td><td>O(n)</td></tr>
+    <tr><td><strong>DBSCAN</strong></td><td>Non</td><td>Arbitraire</td><td>Excellent</td><td>Bonne</td><td>O(n log n)</td></tr>
+    <tr><td><strong>OPTICS</strong></td><td>Non</td><td>Arbitraire</td><td>Excellent</td><td>Bonne</td><td>O(n log n)</td></tr>
+    <tr><td><strong>GMM</strong></td><td>Oui</td><td>Ellipso&#239;dal</td><td>Mod&#233;r&#233;</td><td>Moyenne</td><td>O(nkt)</td></tr>
+    <tr><td><strong>Spectral</strong></td><td>Oui</td><td>Arbitraire</td><td>Variable</td><td>Faible</td><td>O(n&#179;)</td></tr>
+  </tbody>
+  <caption>Table 3 &#8212; Comparaison synth&#233;tique des algorithmes de clustering</caption>
+</table>
+
+<div class="callout info">
+  <div class="callout-title">Guide de s&#233;lection rapide</div>
+  <strong>Grands datasets, clusters sph&#233;riques :</strong> K-Means ou BIRCH<br>
+  <strong>Forme inconnue, outliers :</strong> DBSCAN ou OPTICS<br>
+  <strong>Visualisation de la hi&#233;rarchie :</strong> AGNES (Ward) + dendrogramme<br>
+  <strong>Probabilit&#233;s d&#8217;appartenance :</strong> GMM<br>
+  <strong>Graphes, manifolds :</strong> Spectral Clustering<br>
+  <strong>Donn&#233;es binaires/cat&#233;gorielles :</strong> K-Modes, K-Prototypes
+</div>
+
+
+<!-- ════════════════════════════════════════════
+     PARTIE II — K-MEANS
+════════════════════════════════════════════ -->
+<h1 class="part-title page-break">Partie II &#8212; K-Means Clustering</h1>
+
+<h2 class="section" data-n="8">Pr&#233;sentation du dataset Kaggle Interests</h2>
+
+<p>
+  Le dataset utilis&#233; pour le projet K-Means provient de la plateforme Kaggle et mod&#233;lise les <strong>centres d&#8217;int&#233;r&#234;t des utilisateurs</strong>. Il s&#8217;agit d&#8217;un probl&#232;me de segmentation comportementale : regrouper des utilisateurs selon leurs pr&#233;f&#233;rences d&#233;clar&#233;es.
+</p>
+
+<table>
+  <thead><tr><th>Caract&#233;ristique</th><th>Valeur</th></tr></thead>
+  <tbody>
+    <tr><td>Nombre d&#8217;entr&#233;es</td><td>6 340 utilisateurs</td></tr>
+    <tr><td>Nombre de colonnes</td><td>219 (1 groupe + 1 total + 217 int&#233;r&#234;ts)</td></tr>
+    <tr><td>Colonne cible (non utilis&#233;e)</td><td><code>group</code> : 4 groupes (C, I, P, R)</td></tr>
+    <tr><td>Distribution des groupes</td><td>I: 1 809 &middot; P: 1 731 &middot; C: 1 725 &middot; R: 1 075</td></tr>
+    <tr><td>Variables de features</td><td>217 variables binaires (0/1) : <code>interest1</code> &#224; <code>interest217</code></td></tr>
+    <tr><td>Valeurs manquantes</td><td>NaN remplac&#233;s par 0 (int&#233;r&#234;t absent)</td></tr>
+    <tr><td>Int&#233;r&#234;t le plus populaire</td><td><code>interest215</code> : 4 944 personnes (78 %)</td></tr>
+    <tr><td>Int&#233;r&#234;t le moins populaire</td><td><code>interest2</code> : 1 seule personne</td></tr>
+  </tbody>
+  <caption>Table 4 &#8212; Caract&#233;ristiques du dataset Kaggle Interests</caption>
+</table>
+
+<div class="fig">
+  <img src="screenshots/Screenshot 2025-01-24 063523.png" alt="Aper&#231;u du dataset">
+  <div class="fig-cap">Fig. 3 &#8212; Aper&#231;u des premi&#232;res lignes du dataset : matrice binaire indiquant la pr&#233;sence (1.0) ou l&#8217;absence (NaN&#8594;0) de chaque int&#233;r&#234;t pour chaque utilisateur</div>
+</div>
+
+<div class="callout info">
+  <div class="callout-title">Remarque sur le dataset</div>
+  Le fichier <code>kaggle_Interests_group.csv</code> n&#8217;est pas inclus dans ce d&#233;p&#244;t pour des raisons de licence Kaggle. T&#233;l&#233;chargez-le depuis la plateforme Kaggle et placez-le dans le dossier du notebook avant ex&#233;cution.
+</div>
+
+
+<h2 class="section" data-n="9">Exploration et visualisation des donn&#233;es</h2>
+
+<p>
+  L&#8217;exploration pr&#233;liminaire du dataset r&#233;v&#232;le une <strong>forte disparit&#233;</strong> dans la popularit&#233; des int&#233;r&#234;ts : la grande majorit&#233; des 217 variables pr&#233;sentent tr&#232;s peu d&#8217;activations, tandis qu&#8217;une dizaine concentrent la quasi-totalit&#233; des int&#233;r&#234;ts.
+</p>
+
+<pre><span class="cmt"># Chargement et nettoyage des donn&#233;es</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> sklearn.cluster <span class="kw">import</span> KMeans
+<span class="kw">from</span> sklearn.decomposition <span class="kw">import</span> PCA
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">import</span> seaborn <span class="kw">as</span> sns
+
+data = pd.<span class="fn">read_csv</span>(<span class="str">"kaggle_Interests_group.csv"</span>)
+data = data.<span class="fn">fillna</span>(<span class="num">0</span>)   <span class="cmt"># NaN &#8594; 0 : int&#233;r&#234;t absent</span>
+
+somme_interets = data.<span class="fn">iloc</span>[:, <span class="num">2</span>:].<span class="fn">sum</span>()
+groupes_par_interet = {
+    col: data[data[col] == <span class="num">1</span>][<span class="str">'group'</span>].<span class="fn">value_counts</span>().<span class="fn">to_dict</span>()
+    <span class="kw">for</span> col <span class="kw">in</span> data.columns[<span class="num">2</span>:]
+}</pre>
+
+<div class="fig">
+  <img src="screenshots/Screenshot 2025-01-23 222215.png" alt="Popularit&#233; des int&#233;r&#234;ts">
+  <div class="fig-cap">Fig. 4 &#8212; Nuage de points de la popularit&#233; des 217 int&#233;r&#234;ts. La majorit&#233; sont peu populaires (points violet bas) ; quelques-uns concentrent des milliers d&#8217;utilisateurs (interest215 : ~6 100)</div>
+</div>
+
+<div class="fig">
+  <img src="screenshots/Screenshot 2025-01-24 041751.png" alt="Distribution par groupe">
+  <div class="fig-cap">Fig. 5 &#8212; Distribution des int&#233;r&#234;ts caract&#233;ristiques par groupe (C, I, P, R)</div>
+</div>
+
+<div class="callout tip">
+  <div class="callout-title">Bonne pratique &#8212; R&#233;duction de dimensionnalit&#233;</div>
+  Avec 217 dimensions, K-Means souffre de la <strong>mal&#233;diction de la dimensionnalit&#233;</strong>. Il est conseill&#233; d&#8217;appliquer une <strong>PCA</strong> ou <strong>UMAP</strong> avant le clustering pour r&#233;duire le bruit. Dans ce projet, la PCA est utilis&#233;e uniquement pour la <em>visualisation</em> 2D.
+</div>
+
+
+<h2 class="section" data-n="10">Impl&#233;mentation personnalis&#233;e (algorithme TD)</h2>
+
+<p>
+  Une impl&#233;mentation K-Means <strong>from scratch</strong> a &#233;t&#233; r&#233;alis&#233;e en Python natif pour comprendre les m&#233;canismes internes de l&#8217;algorithme.
+</p>
+
+<pre><span class="kw">def</span> <span class="fn">kmeansTD</span>(data, K, max_iters=<span class="num">100</span>):
+    <span class="cmt"># Initialisation al&#233;atoire des centro&#239;des</span>
+    centroids = data[np.<span class="fn">random.choice</span>(data.<span class="fn">shape</span>[<span class="num">0</span>], K, replace=<span class="kw">False</span>)]
+
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(max_iters):
+        <span class="cmt"># Distances et assignation</span>
+        distances = np.<span class="fn">linalg.norm</span>(data[:, np.newaxis] - centroids, axis=<span class="num">2</span>)
+        clusters = np.<span class="fn">argmin</span>(distances, axis=<span class="num">1</span>)
+
+        <span class="cmt"># Recalcul des centro&#239;des</span>
+        new_centroids = np.<span class="fn">array</span>([
+            data[clusters == k].<span class="fn">mean</span>(axis=<span class="num">0</span>) <span class="kw">for</span> k <span class="kw">in</span> <span class="fn">range</span>(K)
+        ])
+
+        <span class="kw">if</span> np.<span class="fn">all</span>(centroids == new_centroids):
+            <span class="kw">break</span>
+        centroids = new_centroids
+
+    <span class="kw">return</span> clusters, centroids
+
+
+<span class="cmt"># Application K=5 + visualisation PCA</span>
+K = <span class="num">5</span>
+clusters, centroids = <span class="fn">kmeansTD</span>(data_for_clustering.values, K)
+data[<span class="str">'cluster'</span>] = clusters
+
+pca = <span class="fn">PCA</span>(n_components=<span class="num">2</span>)
+data_pca = pca.<span class="fn">fit_transform</span>(data_for_clustering)
+centroids_pca = pca.<span class="fn">transform</span>(centroids)
+
+plt.<span class="fn">figure</span>(figsize=(<span class="num">12</span>, <span class="num">8</span>))
+sns.<span class="fn">scatterplot</span>(data=data, x=<span class="str">'pca1'</span>, y=<span class="str">'pca2'</span>,
+               hue=<span class="str">'cluster'</span>, palette=<span class="str">'viridis'</span>, alpha=<span class="num">0.6</span>)
+plt.<span class="fn">scatter</span>(centroids_pca[:, <span class="num">0</span>], centroids_pca[:, <span class="num">1</span>],
+           s=<span class="num">300</span>, c=<span class="str">'red'</span>, marker=<span class="str">'X'</span>, label=<span class="str">'Centroids'</span>)
+plt.<span class="fn">legend</span>()
+plt.<span class="fn">show</span>()</pre>
+
+<div class="fig">
+  <img src="screenshots/Screenshot 2025-01-24 044703.png" alt="K-Means custom K=5">
+  <div class="fig-cap">Fig. 6 &#8212; Impl&#233;mentation personnalis&#233;e K=5 : 5 clusters bien s&#233;par&#233;s dans l&#8217;espace PCA 2D, centro&#239;des (croix rouges) correctement positionn&#233;s</div>
+</div>
+
+
+<h2 class="section" data-n="11">Impl&#233;mentation avec Scikit-learn</h2>
+
+<pre><span class="kw">from</span> sklearn.cluster <span class="kw">import</span> KMeans
+
+kmeans = <span class="fn">KMeans</span>(n_clusters=<span class="num">3</span>, random_state=<span class="num">42</span>)
+data[<span class="str">'cluster'</span>] = kmeans.<span class="fn">fit_predict</span>(data_for_clustering)
+
+<span class="cmt"># Attribution des int&#233;r&#234;ts au cluster dominant</span>
+interests_cluster_assignment = {}
+<span class="kw">for</span> interest <span class="kw">in</span> data_for_clustering.columns:
+    mean_values = data.<span class="fn">groupby</span>(<span class="str">'cluster'</span>)[interest].<span class="fn">mean</span>()
+    interests_cluster_assignment[interest] = mean_values.<span class="fn">idxmax</span>()
+
+<span class="cmt"># Visualisation PCA</span>
+pca = <span class="fn">PCA</span>(n_components=<span class="num">2</span>)
+data_pca = pca.<span class="fn">fit_transform</span>(data_for_clustering)
+centroids_pca = pca.<span class="fn">transform</span>(kmeans.cluster_centers_)
+
+plt.<span class="fn">figure</span>(figsize=(<span class="num">12</span>, <span class="num">8</span>))
+sns.<span class="fn">scatterplot</span>(data=data, x=<span class="str">'pca1'</span>, y=<span class="str">'pca2'</span>,
+               hue=<span class="str">'cluster'</span>, palette=<span class="str">'viridis'</span>, alpha=<span class="num">0.6</span>)
+plt.<span class="fn">scatter</span>(centroids_pca[:, <span class="num">0</span>], centroids_pca[:, <span class="num">1</span>],
+           s=<span class="num">300</span>, c=<span class="str">'red'</span>, marker=<span class="str">'X'</span>, label=<span class="str">'Centroids'</span>)
+plt.<span class="fn">show</span>()</pre>
+
+<div class="grid2">
+  <div class="fig">
+    <img src="screenshots/Screenshot 2025-01-24 065150.png" alt="sklearn KMeans K=3">
+    <div class="fig-cap">Fig. 7 &#8212; sklearn KMeans K=3 : s&#233;paration nette dans l&#8217;espace PCA</div>
+  </div>
+  <div class="fig">
+    <img src="screenshots/Screenshot 2025-01-24 051539.png" alt="sklearn KMeans K=5">
+    <div class="fig-cap">Fig. 8 &#8212; sklearn KMeans K=5 : segmentation plus fine, 5 groupes coh&#233;rents</div>
+  </div>
+</div>
+
+
+<h2 class="section" data-n="12">R&#233;sultats et analyse</h2>
+
+<table>
+  <thead>
+    <tr><th>Configuration</th><th>K</th><th>Coh&#233;sion visuelle</th><th>Observation</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Impl&#233;mentation TD (custom)</td><td>3</td><td>Bonne</td><td>Clusters bien s&#233;par&#233;s, convergence rapide</td></tr>
+    <tr><td>Impl&#233;mentation TD (custom)</td><td>5</td><td>Tr&#232;s bonne</td><td>Segmentation fine, centro&#239;des bien positionn&#233;s</td></tr>
+    <tr><td>Scikit-learn KMeans</td><td>3</td><td>Excellente</td><td>S&#233;paration nette, K-Means++ plus stable</td></tr>
+    <tr><td>Scikit-learn KMeans</td><td>5</td><td>Excellente</td><td>5 groupes coh&#233;rents, bonne couverture</td></tr>
+  </tbody>
+  <caption>Table 5 &#8212; Comparaison des configurations K-Means test&#233;es</caption>
+</table>
+
+<div class="callout warn">
+  <div class="callout-title">Limitation &#8212; Donn&#233;es binaires et K-Means</div>
+  K-Means calcule des <strong>moyennes</strong> de centro&#239;des, ce qui n&#8217;est pas naturel pour des donn&#233;es binaires. Pour des donn&#233;es binaires, <strong>K-Modes</strong> ou <strong>K-Prototypes</strong> sont plus appropri&#233;s car ils utilisent le mode plut&#244;t que la moyenne.
+</div>
+
+
+<!-- ════════════════════════════════════════════
+     PARTIE III — HIÉRARCHIQUE
+════════════════════════════════════════════ -->
+<h1 class="part-title page-break">Partie III &#8212; Clustering Hi&#233;rarchique</h1>
+
+<h2 class="section" data-n="13">Pr&#233;sentation du dataset COVID-19 Europe</h2>
+
+<p>
+  Le dataset compile les donn&#233;es &#233;pid&#233;miologiques COVID-19 pour les <strong>30 pays europ&#233;ens</strong> de l&#8217;UE et de l&#8217;EEE, publi&#233;es par l&#8217;ECDC. L&#8217;objectif est de <strong>regrouper les pays selon leurs profils &#233;pid&#233;miques similaires</strong> sur la dur&#233;e de la pand&#233;mie.
+</p>
+
+<div class="fig">
+  <img src="screenshots/Screenshot 2025-01-24 165254.png" alt="Aper&#231;u dataset COVID-19">
+  <div class="fig-cap">Fig. 9 &#8212; Aper&#231;u des premi&#232;res lignes du dataset COVID-19 : donn&#233;es journali&#232;res par pays (cas, d&#233;c&#232;s, population)</div>
+</div>
+
+<table>
+  <thead><tr><th>Colonne</th><th>Type</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><code>dateRep</code></td><td>object &#8594; datetime</td><td>Date de rapport (DD/MM/YYYY)</td></tr>
+    <tr><td><code>cases</code></td><td>float64</td><td>Nouveaux cas quotidiens</td></tr>
+    <tr><td><code>deaths</code></td><td>float64</td><td>D&#233;c&#232;s quotidiens</td></tr>
+    <tr><td><code>countriesAndTerritories</code></td><td>object</td><td>Nom du pays (30 pays)</td></tr>
+    <tr><td><code>popData2020</code></td><td>int64</td><td>Population 2020</td></tr>
+    <tr><td><code>continentExp</code></td><td>object</td><td>Continent (tous : Europe)</td></tr>
+  </tbody>
+  <caption>Table 6 &#8212; Description des colonnes du dataset COVID-19 (28 729 entr&#233;es)</caption>
+</table>
+
+<div class="fig">
+  <img src="screenshots/Screenshot 2025-01-24 172828.png" alt="Cas cumul&#233;s COVID-19">
+  <div class="fig-cap">Fig. 10 &#8212; Augmentation des cas cumul&#233;s de COVID-19 pour les 30 pays europ&#233;ens (2020&#8211;2022)</div>
+</div>
+
+
+<h2 class="section" data-n="14">Pr&#233;traitement et alignement temporel</h2>
+
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> MinMaxScaler
+
+<span class="cmt"># Alignement sur la plage temporelle commune &#224; tous les pays</span>
+data[<span class="str">'dateRep'</span>] = pd.<span class="fn">to_datetime</span>(data[<span class="str">'dateRep'</span>], format=<span class="str">'%d/%m/%Y'</span>)
+
+start_dates = data.<span class="fn">groupby</span>(<span class="str">'countriesAndTerritories'</span>)[<span class="str">'dateRep'</span>].<span class="fn">min</span>().<span class="fn">max</span>()
+end_dates   = data.<span class="fn">groupby</span>(<span class="str">'countriesAndTerritories'</span>)[<span class="str">'dateRep'</span>].<span class="fn">max</span>().<span class="fn">min</span>()
+aligned_data = data[(data[<span class="str">'dateRep'</span>] >= start_dates) &amp; (data[<span class="str">'dateRep'</span>] &lt;= end_dates)]
+<span class="cmt"># Plage commune : 2020-03-14 &#8594; 2022-10-12</span>
+
+<span class="cmt"># Normalisation Min-Max + agr&#233;gation par pays</span>
+<span class="kw">def</span> <span class="fn">normalize_column</span>(column):
+    scaler = <span class="fn">MinMaxScaler</span>()
+    <span class="kw">return</span> scaler.<span class="fn">fit_transform</span>(column.values.<span class="fn">reshape</span>(-<span class="num">1</span>, <span class="num">1</span>)).<span class="fn">flatten</span>()
+
+aligned_data[<span class="str">'cases_normalized'</span>]  = <span class="fn">normalize_column</span>(aligned_data[<span class="str">'cases'</span>])
+aligned_data[<span class="str">'deaths_normalized'</span>] = <span class="fn">normalize_column</span>(aligned_data[<span class="str">'deaths'</span>])
+
+country_totals = aligned_data.<span class="fn">groupby</span>(<span class="str">'countriesAndTerritories'</span>).<span class="fn">agg</span>({
+    <span class="str">'cases_normalized'</span> : <span class="str">'sum'</span>,
+    <span class="str">'deaths_normalized'</span>: <span class="str">'sum'</span>
+}).<span class="fn">reset_index</span>()
+country_totals.columns = [<span class="str">'countriesAndTerritories'</span>, <span class="str">'total_cases'</span>, <span class="str">'total_deaths'</span>]
+country_totals[<span class="str">'cases_deaths_sum'</span>] = country_totals[<span class="str">'total_cases'</span>] + country_totals[<span class="str">'total_deaths'</span>]</pre>
+
+<div class="fig">
+  <img src="screenshots/Screenshot 2025-01-24 172445.png" alt="Population par pays">
+  <div class="fig-cap">Fig. 11 &#8212; Population ajust&#233;e par pays sur la p&#233;riode d&#8217;analyse, justifiant la n&#233;cessit&#233; de la normalisation avant clustering</div>
+</div>
+
+<div class="callout tip">
+  <div class="callout-title">Pourquoi la normalisation Min-Max ?</div>
+  Sans normalisation, les grands pays (France, Allemagne) domineraient le clustering par leur seule taille. La normalisation ramène les valeurs dans <code>[0, 1]</code>, mettant tous les pays sur un pied d&#8217;&#233;galit&#233;.
+</div>
+
+
+<h2 class="section" data-n="15">Approche agglom&#233;rative Bottom-Up (Ward)</h2>
+
+<pre><span class="kw">from</span> scipy.cluster.hierarchy <span class="kw">import</span> dendrogram, linkage, fcluster
+
+linkage_matrix = <span class="fn">linkage</span>(country_totals[[<span class="str">'cases_deaths_sum'</span>]], method=<span class="str">'ward'</span>)
+
+plt.<span class="fn">figure</span>(figsize=(<span class="num">15</span>, <span class="num">10</span>))
+<span class="fn">dendrogram</span>(linkage_matrix, labels=country_totals[<span class="str">'countriesAndTerritories'</span>].values)
+plt.<span class="fn">title</span>(<span class="str">"Dendrogramme Bottom-Up (Ward)"</span>)
+plt.<span class="fn">show</span>()
+
+<span class="cmt"># Seuil automatique = moiti&#233; de la distance max</span>
+seuil = linkage_matrix[:, <span class="num">2</span>].<span class="fn">max</span>() / <span class="num">2</span>
+country_totals[<span class="str">'cluster'</span>] = <span class="fn">fcluster</span>(linkage_matrix, t=seuil, criterion=<span class="str">'distance'</span>)
+
+<span class="cmt"># Clustering sur cas seuls et d&#233;c&#232;s seuls</span>
+<span class="kw">for</span> col, label <span class="kw">in</span> [(<span class="str">'total_cases'</span>, <span class="str">'cluster_cases'</span>), (<span class="str">'total_deaths'</span>, <span class="str">'cluster_deaths'</span>)]:
+    lm = <span class="fn">linkage</span>(country_totals[[col]], method=<span class="str">'ward'</span>)
+    country_totals[label] = <span class="fn">fcluster</span>(lm, t=lm[:, <span class="num">2</span>].<span class="fn">max</span>() / <span class="num">2</span>, criterion=<span class="str">'distance'</span>)</pre>
+
+<div class="callout def">
+  <div class="callout-title">Comment lire un dendrogramme ?</div>
+  L&#8217;axe Y repr&#233;sente la <strong>distance de fusion</strong>. Plus la barre est haute, plus les clusters fusionn&#233;s sont dissemblables. Pour choisir <em>k</em>, cherchez le <strong>plus grand saut vertical</strong> et tracez une ligne horizontale &#224; cette hauteur.
+</div>
+
+
+<h2 class="section" data-n="16">Approche divisive Top-Down</h2>
+
+<pre><span class="kw">from</span> scipy.cluster.hierarchy <span class="kw">import</span> cut_tree
+
+<span class="cmt"># M&#234;me matrice, lue de haut en bas</span>
+plt.<span class="fn">figure</span>(figsize=(<span class="num">15</span>, <span class="num">10</span>))
+<span class="fn">dendrogram</span>(linkage_matrix, labels=country_totals[<span class="str">'countriesAndTerritories'</span>].values)
+plt.<span class="fn">title</span>(<span class="str">"Dendrogramme Top-Down"</span>)
+plt.<span class="fn">gca</span>().xaxis.<span class="fn">tick_top</span>()
+plt.<span class="fn">show</span>()
+
+<span class="cmt"># D&#233;coupage en k=4 clusters</span>
+country_totals[<span class="str">'cluster'</span>] = <span class="fn">cut_tree</span>(linkage_matrix, n_clusters=<span class="num">4</span>).<span class="fn">flatten</span>()
+
+<span class="kw">for</span> c <span class="kw">in</span> country_totals[<span class="str">'cluster'</span>].<span class="fn">unique</span>():
+    pays = country_totals[country_totals[<span class="str">'cluster'</span>] == c][<span class="str">'countriesAndTerritories'</span>].<span class="fn">tolist</span>()
+    <span class="fn">print</span>(<span class="str">f"Cluster {c}: {pays}"</span>)</pre>
+
+<div class="callout info">
+  <div class="callout-title">Diff&#233;rence cl&#233; Bottom-Up vs Top-Down</div>
+  <strong>Bottom-Up (AGNES/Ward) :</strong> chaque pays commence seul, les plus proches fusionnent. Seuil automatique.<br>
+  <strong>Top-Down (DIANA) :</strong> on part d&#8217;un cluster global et on divise. k=4 sp&#233;cifi&#233; via <code>cut_tree</code>.<br>
+  Les deux utilisent la <em>m&#234;me matrice Ward</em>, mais la direction de lecture change le sens de l&#8217;analyse.
+</div>
+
+
+<h2 class="section" data-n="17">Analyse des r&#233;sultats</h2>
+
+<table>
+  <thead>
+    <tr><th>Cluster type</th><th>Pays caract&#233;ristiques</th><th>Profil &#233;pid&#233;mique</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Forte incidence</td><td>France, Allemagne, Italie</td><td>Grandes populations, pics &#233;lev&#233;s</td></tr>
+    <tr><td>Incidence mod&#233;r&#233;e</td><td>Belgique, Pays-Bas, Espagne</td><td>Incidence &#233;lev&#233;e rapport&#233;e &#224; la population</td></tr>
+    <tr><td>Faible incidence</td><td>Liechtenstein, Islande, Chypre</td><td>Tr&#232;s petites populations, courbes atypiques</td></tr>
+    <tr><td>Profil interm&#233;diaire</td><td>Pologne, Roumanie, Hongrie</td><td>Vagues d&#233;cal&#233;es, sous-d&#233;claration initiale</td></tr>
+  </tbody>
+  <caption>Table 7 &#8212; Profils &#233;pid&#233;miques interpr&#233;t&#233;s &#224; partir des clusters hi&#233;rarchiques</caption>
+</table>
+
+<div class="callout warn">
+  <div class="callout-title">Biais de la m&#233;trique composite</div>
+  La m&#233;trique <code>cases_deaths_sum</code> accorde un poids &#233;gal aux cas et aux d&#233;c&#232;s. Une pond&#233;ration ou une normalisation s&#233;par&#233;e serait plus rigoureuse.
+</div>
+
+
+<!-- ════════════════════════════════════════════
+     PARTIE IV — CONSEILS
+════════════════════════════════════════════ -->
+<h1 class="part-title page-break">Partie IV &#8212; Conseils pratiques &amp; Approfondissements</h1>
+
+<h2 class="section" data-n="18">Choisir le bon algorithme</h2>
+
+<div class="callout tip">
+  <div class="callout-title">Arbre de d&#233;cision &#8212; Choisir son algorithme</div>
+  <strong>1. Connaissez-vous le nombre de clusters ?</strong><br>
+  &nbsp;&nbsp;&nbsp;&#8594; Oui : K-Means, K-Medoids, GMM, Spectral<br>
+  &nbsp;&nbsp;&nbsp;&#8594; Non : DBSCAN, OPTICS, Clustering hi&#233;rarchique<br><br>
+  <strong>2. Quelle est la forme attendue des clusters ?</strong><br>
+  &nbsp;&nbsp;&nbsp;&#8594; Sph&#233;rique : K-Means &nbsp;&nbsp; &#8594; Ellipso&#239;dale : GMM &nbsp;&nbsp; &#8594; Arbitraire : DBSCAN, Spectral<br><br>
+  <strong>3. Quel est l&#8217;ordre de grandeur du dataset ?</strong><br>
+  &nbsp;&nbsp;&nbsp;&#8594; &lt; 10k : tous les algorithmes<br>
+  &nbsp;&nbsp;&nbsp;&#8594; 10k&#8211;1M : K-Means, DBSCAN, BIRCH<br>
+  &nbsp;&nbsp;&nbsp;&#8594; &gt; 1M : Mini-Batch K-Means, BIRCH<br><br>
+  <strong>4. Y a-t-il des outliers ?</strong><br>
+  &nbsp;&nbsp;&nbsp;&#8594; Oui : K-Medoids, DBSCAN &nbsp;&nbsp; &#8594; Non : K-Means, AGNES
+</div>
+
+
+<h2 class="section" data-n="19">D&#233;terminer K optimal &#8212; Elbow &amp; Silhouette</h2>
+
+<h3 class="subsection">M&#233;thode du coude (Elbow Method)</h3>
+
+<pre><span class="kw">from</span> sklearn.cluster <span class="kw">import</span> KMeans
+
+inertias = []
+K_range = <span class="fn">range</span>(<span class="num">1</span>, <span class="num">11</span>)
+<span class="kw">for</span> k <span class="kw">in</span> K_range:
+    km = <span class="fn">KMeans</span>(n_clusters=k, random_state=<span class="num">42</span>, n_init=<span class="num">10</span>)
+    km.<span class="fn">fit</span>(data_for_clustering)
+    inertias.<span class="fn">append</span>(km.inertia_)
+
+plt.<span class="fn">plot</span>(K_range, inertias, marker=<span class="str">'o'</span>)
+plt.<span class="fn">xlabel</span>(<span class="str">'k'</span>) ; plt.<span class="fn">ylabel</span>(<span class="str">'Inertie (WCSS)'</span>)
+plt.<span class="fn">title</span>(<span class="str">'M&#233;thode du coude'</span>) ; plt.<span class="fn">show</span>()</pre>
+
+<h3 class="subsection">Score de silhouette</h3>
+
+<pre><span class="kw">from</span> sklearn.metrics <span class="kw">import</span> silhouette_score
+
+silhouette_scores = []
+<span class="kw">for</span> k <span class="kw">in</span> <span class="fn">range</span>(<span class="num">2</span>, <span class="num">11</span>):
+    km = <span class="fn">KMeans</span>(n_clusters=k, random_state=<span class="num">42</span>, n_init=<span class="num">10</span>)
+    labels = km.<span class="fn">fit_predict</span>(data_for_clustering)
+    silhouette_scores.<span class="fn">append</span>(<span class="fn">silhouette_score</span>(data_for_clustering, labels))
+
+plt.<span class="fn">plot</span>(<span class="fn">range</span>(<span class="num">2</span>, <span class="num">11</span>), silhouette_scores, marker=<span class="str">'s'</span>, color=<span class="str">'darkorange'</span>)
+plt.<span class="fn">title</span>(<span class="str">'Score de silhouette en fonction de k'</span>) ; plt.<span class="fn">show</span>()
+<span class="cmt"># Le k optimal correspond au maximum</span></pre>
+
+<table>
+  <thead>
+    <tr><th>M&#233;thode</th><th>Crit&#232;re</th><th>Avantages</th><th>Limites</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Elbow</strong></td><td>Point d&#8217;inflexion inertie vs k</td><td>Simple, rapide</td><td>Subjectif</td></tr>
+    <tr><td><strong>Silhouette</strong></td><td>Maximum du score moyen</td><td>Objectif</td><td>Co&#251;teux O(n&#178;)</td></tr>
+    <tr><td><strong>Gap Statistic</strong></td><td>&#201;cart vs distribution uniforme</td><td>Statistiquement fond&#233;</td><td>Complexe</td></tr>
+    <tr><td><strong>Davies-Bouldin</strong></td><td>Minimum de l&#8217;index DB</td><td>Compacit&#233; &amp; s&#233;paration</td><td>Favorise les sph&#232;res</td></tr>
+  </tbody>
+  <caption>Table 8 &#8212; M&#233;thodes pour d&#233;terminer le nombre optimal de clusters</caption>
+</table>
+
+
+<h2 class="section" data-n="20">Pi&#232;ges courants et bonnes pratiques</h2>
+
+<div class="callout warn">
+  <div class="callout-title">Pi&#232;ge 1 &#8212; Oublier de normaliser</div>
+  Si les features ont des &#233;chelles tr&#232;s diff&#233;rentes, K-Means sera <strong>domin&#233; par la feature &#224; grande &#233;chelle</strong>. Toujours normaliser (StandardScaler ou MinMaxScaler) avant d&#8217;appliquer un clustering.
+</div>
+
+<div class="callout warn">
+  <div class="callout-title">Pi&#232;ge 2 &#8212; Confondre cluster et classe</div>
+  Les clusters obtenus ne correspondent pas n&#233;cessairement aux classes r&#233;elles. L&#8217;<strong>ARI (Adjusted Rand Index)</strong> permet de mesurer la correspondance si les &#233;tiquettes sont disponibles.
+</div>
+
+<div class="callout warn">
+  <div class="callout-title">Pi&#232;ge 3 &#8212; Haute dimensionnalit&#233;</div>
+  En haute dimension, les distances euclidiennes deviennent quasi-uniformes. Appliquer <strong>PCA, UMAP ou t-SNE</strong> avant le clustering, pas seulement pour la visualisation.
+</div>
+
+<div class="callout tip">
+  <div class="callout-title">Pipeline de validation recommand&#233;</div>
+  <ol class="steps">
+    <li>Explorer les donn&#233;es : distributions, corr&#233;lations, valeurs manquantes</li>
+    <li>Pr&#233;traiter : imputation, normalisation, r&#233;duction dimensionnelle</li>
+    <li>Tester plusieurs algorithmes et plusieurs valeurs de k</li>
+    <li>&#201;valuer : Elbow, Silhouette, Davies-Bouldin</li>
+    <li>Interpr&#233;ter les clusters (profiling, visualisation)</li>
+    <li>Valider avec un expert du domaine si possible</li>
+  </ol>
+</div>
+
+<table>
+  <thead>
+    <tr><th>M&#233;trique</th><th>Formule</th><th>Optimum</th><th>Usage</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Inertie (WCSS)</strong></td><td>&#8721; d(x&#7522;, &#956;C&#7522;)&#178;</td><td>Minimiser</td><td>M&#233;thode du coude</td></tr>
+    <tr><td><strong>Silhouette</strong></td><td>(b&#8722;a)/max(a,b)</td><td>Max [&#8722;1, 1]</td><td>Qualit&#233; globale</td></tr>
+    <tr><td><strong>Davies-Bouldin</strong></td><td>mean(R&#7522;)</td><td>Minimiser &#8805; 0</td><td>Compacit&#233; &amp; s&#233;paration</td></tr>
+    <tr><td><strong>Calinski-Harabasz</strong></td><td>BSS/WSS &#215; (n&#8722;k)/(k&#8722;1)</td><td>Maximiser</td><td>Rapport inter/intra</td></tr>
+    <tr><td><strong>Dunn Index</strong></td><td>min(d_inter)/max(d_intra)</td><td>Maximiser</td><td>Clusters compacts et s&#233;par&#233;s</td></tr>
+  </tbody>
+  <caption>Table 9 &#8212; M&#233;triques d&#8217;&#233;valuation interne du clustering (sans labels)</caption>
+</table>
+
+
+<h2 class="section" data-n="21">Extensions et perspectives</h2>
+
+<h3 class="subsection">Am&#233;liorations imm&#233;diates de ces projets</h3>
+<ul style="margin-left:1.5rem;font-size:.97rem">
+  <li style="margin-bottom:.6rem"><strong>K-Means :</strong> Ajouter la m&#233;thode du coude et le score de silhouette pour justifier k=3 ou k=5 ; appliquer K-Modes pour donn&#233;es binaires</li>
+  <li style="margin-bottom:.6rem"><strong>K-Means :</strong> Comparer avec DBSCAN pour v&#233;rifier la pr&#233;sence d&#8217;outliers dans le dataset d&#8217;int&#233;r&#234;ts</li>
+  <li style="margin-bottom:.6rem"><strong>Hi&#233;rarchique :</strong> Tester diff&#233;rentes m&#233;thodes de liaison (complete, average) ; calculer le score de silhouette pour valider le seuil</li>
+  <li style="margin-bottom:.6rem"><strong>Hi&#233;rarchique :</strong> Enrichir les features avec le taux d&#8217;incidence (cas/population) pour une comparaison plus &#233;quitable</li>
+  <li style="margin-bottom:.6rem"><strong>Les deux :</strong> Utiliser UMAP au lieu de PCA pour des visualisations 2D plus fid&#232;les</li>
+</ul>
+
+<h3 class="subsection">Pistes d&#8217;approfondissement</h3>
+<ul style="margin-left:1.5rem;font-size:.97rem">
+  <li style="margin-bottom:.5rem"><strong>Clustering temporel :</strong> Appliquer le clustering sur les s&#233;ries temporelles COVID-19 directement (distance DTW)</li>
+  <li style="margin-bottom:.5rem"><strong>Semi-supervis&#233; :</strong> Exploiter les &#233;tiquettes partielles dans un Constrained K-Means</li>
+  <li style="margin-bottom:.5rem"><strong>Interpr&#233;tabilit&#233; :</strong> Utiliser des Shapley Values pour expliquer l&#8217;appartenance &#224; un cluster</li>
+  <li style="margin-bottom:.5rem"><strong>D&#233;ploiement :</strong> Packager le clustering dans une API REST (FastAPI) pour segmentation en temps r&#233;el</li>
+  <li style="margin-bottom:.5rem"><strong>AutoML :</strong> Explorer <code>auto-sklearn</code> ou <code>pycaret</code> pour automatiser la s&#233;lection d&#8217;algorithme</li>
+</ul>
+
+<div class="callout tip">
+  <div class="callout-title">Ressources recommand&#233;es</div>
+  <strong>Livres :</strong> &#171; Introduction to Data Mining &#187; (Tan, Steinbach, Kumar) &middot; &#171; Pattern Recognition and Machine Learning &#187; (Bishop)<br>
+  <strong>Cours :</strong> Andrew Ng &#8211; Unsupervised Learning (Coursera) &middot; Fast.ai<br>
+  <strong>Biblioth&#232;ques :</strong> <code>scikit-learn</code> &middot; <code>scipy.cluster</code> &middot; <code>hdbscan</code> &middot; <code>umap-learn</code> &middot; <code>yellowbrick</code><br>
+  <strong>Datasets :</strong> UCI ML Repository &middot; Kaggle &middot; OpenML
+</div>
+
+
+<!-- ════════════════════════════════════════════
+     RÉFÉRENCES
+════════════════════════════════════════════ -->
+<h2 class="section" data-n="">R&#233;f&#233;rences</h2>
+<ol class="biblio">
+  <li>Tan, P.-N., Steinbach, M., &amp; Kumar, V. (2019). <em>Introduction to Data Mining</em> (2e &#233;d.). Pearson.</li>
+  <li>Han, J., Kamber, M., &amp; Pei, J. (2011). <em>Data Mining: Concepts and Techniques</em> (3e &#233;d.). Morgan Kaufmann.</li>
+  <li>Ester, M. et al. (1996). A density-based algorithm for discovering clusters in large spatial databases with noise. <em>KDD-96</em>, 226&#8211;231.</li>
+  <li>Ward, J. H. (1963). Hierarchical grouping to optimize an objective function. <em>JASA</em>, 58(301), 236&#8211;244.</li>
+  <li>MacQueen, J. (1967). Some methods for classification and analysis of multivariate observations. <em>5th Berkeley Symposium</em>, 1, 281&#8211;297.</li>
+  <li>Arthur, D., &amp; Vassilvitskii, S. (2007). K-Means++: The advantages of careful seeding. <em>SODA &#8217;07</em>, 1027&#8211;1035.</li>
+  <li>Pedregosa, F. et al. (2011). Scikit-learn: Machine learning in Python. <em>JMLR</em>, 12, 2825&#8211;2830.</li>
+  <li>Virtanen, P. et al. (2020). SciPy 1.0: Fundamental algorithms for scientific computing in Python. <em>Nature Methods</em>, 17, 261&#8211;272.</li>
+  <li>Rousseeuw, P. J. (1987). Silhouettes: A graphical aid to the interpretation and validation of cluster analysis. <em>JCAM</em>, 20, 53&#8211;65.</li>
+  <li>ECDC (2022). <em>COVID-19 surveillance data</em>. Donn&#233;es utilis&#233;es pour le projet de clustering hi&#233;rarchique.</li>
+</ol>
+
+</body>
+</html>
